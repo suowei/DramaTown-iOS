@@ -29,11 +29,13 @@ class EpisodeViewController: UITableViewController {
     @IBOutlet weak var original: UILabel!
     @IBOutlet weak var duration: UILabel!
     @IBOutlet weak var releaseDate: UILabel!
-    @IBOutlet weak var url: UILabel!
+    @IBOutlet weak var url: UITextView!
     @IBOutlet weak var sc: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        url.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 
         if let episodeId = episodeId {
             Alamofire.request(Router.ReadEpisode(id: episodeId)).validate().responseJSON { response in
