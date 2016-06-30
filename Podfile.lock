@@ -1,0 +1,37 @@
+PODS:
+  - Alamofire (3.4.1)
+  - Cosmos (1.2.3)
+  - Kingfisher (2.4.1)
+  - MJRefresh (3.1.4)
+  - SwiftyJSON (2.3.2)
+  - TagListView (1.0.0)
+  - TFBubbleItUp (1.5.1)
+
+DEPENDENCIES:
+  - Alamofire (~> 3.3)
+  - Cosmos (~> 1.2)
+  - Kingfisher (~> 2.2)
+  - MJRefresh
+  - SwiftyJSON (from `https://github.com/SwiftyJSON/SwiftyJSON.git`)
+  - TagListView (~> 1.0)
+  - TFBubbleItUp
+
+EXTERNAL SOURCES:
+  SwiftyJSON:
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
+
+CHECKOUT OPTIONS:
+  SwiftyJSON:
+    :commit: 2a5b70f06001316d4fb54501edc70b4084705da0
+    :git: https://github.com/SwiftyJSON/SwiftyJSON.git
+
+SPEC CHECKSUMS:
+  Alamofire: 01a82e2f6c0f860ade35534c8dd88be61bdef40c
+  Cosmos: efddd01b729956ad6335bc58bc92e5735a1d12a3
+  Kingfisher: 41aed5b6c1ed8fa98cf6d75283ce89cf7890f517
+  MJRefresh: 4490b0b8ae6e14621016c61a0efc7eef132b3186
+  SwiftyJSON: 04ccea08915aa0109039157c7974cf0298da292a
+  TagListView: 6bf4bded034c4c90b1e90d8cd3d8e1d852dba0a8
+  TFBubbleItUp: 10b744a90ccb8072c62a8e9890ec1b387457a784
+
+COCOAPODS: 0.39.0
