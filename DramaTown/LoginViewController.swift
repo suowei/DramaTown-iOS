@@ -18,6 +18,10 @@ class LoginViewController: UIViewController {
         login()
     }
     
+    @IBAction func cancel(sender: UIBarButtonItem) {
+        navigationController?.popViewControllerAnimated(true)
+    }
+    
     func login() {
         loginButton.enabled = false
         Alamofire.request(Router.GetToken()).validate().responseJSON { response in
