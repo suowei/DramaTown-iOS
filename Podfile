@@ -9,4 +9,5 @@ target 'DramaTown' do
   pod 'Cosmos', '~> 1.2'
   pod 'TagListView', '~> 1.0'
   pod 'TFBubbleItUp'
+  pod 'IQKeyboardManagerSwift'
 end
