@@ -27,29 +27,29 @@ class UserViewController: UITableViewController {
         refresh()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         if userId == nil {
             isRootView = true
-            if let userId = NSUserDefaults.standardUserDefaults().valueForKey("UserId") as? Int {
+            if let userId = UserDefaults.standard.value(forKey: "UserId") as? Int {
                 self.userId = userId
                 refresh()
             } else {
-                performSegueWithIdentifier("Login", sender: nil)
+                performSegue(withIdentifier: "Login", sender: nil)
             }
         }
     }
     
     func refresh() {
         if let userId = userId {
-            Alamofire.request(Router.ReadUser(id: userId)).validate().responseJSON { response in
+            Alamofire.request(Router.readUser(id: userId)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         self.user = User(json: JSON(value))
                         self.setUpViews()
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
             }
@@ -78,72 +78,72 @@ class UserViewController: UITableViewController {
         }
     }
 
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 44
     }
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return isRootView ? 5 : 4
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowEpfavs0" {
-            let userEpfavsViewController = segue.destinationViewController as! UserEpfavsViewController
+            let userEpfavsViewController = segue.destination as! UserEpfavsViewController
             userEpfavsViewController.userId = userId
             userEpfavsViewController.type = 0
         } else if segue.identifier == "ShowEpfavs2" {
-            let userEpfavsViewController = segue.destinationViewController as! UserEpfavsViewController
+            let userEpfavsViewController = segue.destination as! UserEpfavsViewController
             userEpfavsViewController.userId = userId
             userEpfavsViewController.type = 2
         } else if segue.identifier == "ShowEpfavs4" {
-            let userEpfavsViewController = segue.destinationViewController as! UserEpfavsViewController
+            let userEpfavsViewController = segue.destination as! UserEpfavsViewController
             userEpfavsViewController.userId = userId
             userEpfavsViewController.type = 4
         } else if segue.identifier == "ShowFavorites0" {
-            let userFavoritesViewController = segue.destinationViewController as! UserFavoritesViewController
+            let userFavoritesViewController = segue.destination as! UserFavoritesViewController
             userFavoritesViewController.userId = userId
             userFavoritesViewController.type = 0
         } else if segue.identifier == "ShowFavorites1" {
-            let userFavoritesViewController = segue.destinationViewController as! UserFavoritesViewController
+            let userFavoritesViewController = segue.destination as! UserFavoritesViewController
             userFavoritesViewController.userId = userId
             userFavoritesViewController.type = 1
         } else if segue.identifier == "ShowFavorites2" {
-            let userFavoritesViewController = segue.destinationViewController as! UserFavoritesViewController
+            let userFavoritesViewController = segue.destination as! UserFavoritesViewController
             userFavoritesViewController.userId = userId
             userFavoritesViewController.type = 2
         } else if segue.identifier == "ShowFavorites3" {
-            let userFavoritesViewController = segue.destinationViewController as! UserFavoritesViewController
+            let userFavoritesViewController = segue.destination as! UserFavoritesViewController
             userFavoritesViewController.userId = userId
             userFavoritesViewController.type = 3
         } else if segue.identifier == "ShowFavorites4" {
-            let userFavoritesViewController = segue.destinationViewController as! UserFavoritesViewController
+            let userFavoritesViewController = segue.destination as! UserFavoritesViewController
             userFavoritesViewController.userId = userId
             userFavoritesViewController.type = 4
         } else if segue.identifier == "ShowReviews" {
-            let userReviewsViewController = segue.destinationViewController as! UserReviewsViewController
+            let userReviewsViewController = segue.destination as! UserReviewsViewController
             userReviewsViewController.userId = userId
         } else if segue.identifier == "Login" {
-            let loginViewController = segue.destinationViewController as! LoginViewController
+            let loginViewController = segue.destination as! LoginViewController
             loginViewController.unwindSegueIdentifier = "UnWindToUserViewController"
             loginViewController.navigationItem.hidesBackButton = true
         } else if segue.identifier == "Logout" {
-            let loginViewController = segue.destinationViewController as! LoginViewController
+            let loginViewController = segue.destination as! LoginViewController
             loginViewController.unwindSegueIdentifier = "UnWindToUserViewController"
             loginViewController.navigationItem.hidesBackButton = true
-            NSUserDefaults.standardUserDefaults().removeObjectForKey("UserId")
-            for cookie in NSHTTPCookieStorage.sharedHTTPCookieStorage().cookies! {
-                NSHTTPCookieStorage.sharedHTTPCookieStorage().deleteCookie(cookie)
+            UserDefaults.standard.removeObject(forKey: "UserId")
+            for cookie in HTTPCookieStorage.shared.cookies! {
+                HTTPCookieStorage.shared.deleteCookie(cookie)
             }
         }
     }
     
-    @IBAction func unwindToUserViewController(sender: UIStoryboardSegue) {
-        if (sender.sourceViewController as? LoginViewController) != nil {
-            userId = NSUserDefaults.standardUserDefaults().valueForKey("UserId") as? Int
+    @IBAction func unwindToUserViewController(_ sender: UIStoryboardSegue) {
+        if (sender.source as? LoginViewController) != nil {
+            userId = UserDefaults.standard.value(forKey: "UserId") as? Int
             refresh()
         }
     }

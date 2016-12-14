@@ -10,22 +10,22 @@ class ExploreViewController: UITableViewController, UISearchBarDelegate {
         searchBar.delegate = self
     }
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
-        performSegueWithIdentifier("ShowSearchResult", sender: nil)
+        performSegue(withIdentifier: "ShowSearchResult", sender: nil)
     }
 
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowSearchResult" {
-            let searchViewController = segue.destinationViewController as! SearchViewController
+            let searchViewController = segue.destination as! SearchViewController
             searchViewController.keyword = searchBar.text
             searchBar.text = nil
         }

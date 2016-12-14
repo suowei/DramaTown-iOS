@@ -37,9 +37,9 @@ class UserFavoritesViewController: UITableViewController {
     
     func loadNewData() {
         if let userId = userId {
-            Alamofire.request(Router.UserFavorites(id: userId, type: type, page: 0)).validate().responseJSON { response in
+            Alamofire.request(Router.userFavorites(id: userId, type: type, page: 0)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         self.favorites.removeAll()
@@ -48,11 +48,11 @@ class UserFavoritesViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
                 self.tableView.mj_header.endRefreshing()
@@ -62,9 +62,9 @@ class UserFavoritesViewController: UITableViewController {
     
     func loadMoreData() {
         if let userId = userId {
-            Alamofire.request(Router.UserFavorites(id: userId, type: type, page: currentPage + 1)).validate().responseJSON { response in
+            Alamofire.request(Router.userFavorites(id: userId, type: type, page: currentPage + 1)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         for favorite in json["data"].arrayValue {
@@ -72,11 +72,11 @@ class UserFavoritesViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     self.tableView.mj_footer.endRefreshing()
                     print(error)
                 }
@@ -84,33 +84,33 @@ class UserFavoritesViewController: UITableViewController {
         }
     }
 
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return favorites.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("FavoriteCell", forIndexPath: indexPath) as! UserFavoritesTableViewCell
-        let favorite = favorites[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "FavoriteCell", for: indexPath) as! UserFavoritesTableViewCell
+        let favorite = favorites[(indexPath as NSIndexPath).row]
         cell.title.text = favorite.drama?.title
         cell.cv.text = favorite.drama?.cv
         if favorite.rating > 0 {
             cell.rating.rating = favorite.rating
             cell.rating.text = favorite.ratingString
-            cell.rating.hidden = false
+            cell.rating.isHidden = false
         } else {
-            cell.rating.hidden = true
+            cell.rating.isHidden = true
         }
         cell.tags.removeAllTags()
         if !favorite.tags.isEmpty {
-            for tag in favorite.tags.componentsSeparatedByString(",") {
+            for tag in favorite.tags.components(separatedBy: ",") {
                 cell.tags.addTag(tag)
             }
         }
@@ -118,12 +118,12 @@ class UserFavoritesViewController: UITableViewController {
         return cell
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDrama" {
-            let dramaViewController = segue.destinationViewController as! DramaViewController
+            let dramaViewController = segue.destination as! DramaViewController
             if let selectedCell = sender as? UITableViewCell {
-                let indexPath = tableView.indexPathForCell(selectedCell)!
-                dramaViewController.dramaId = favorites[indexPath.row].dramaId
+                let indexPath = tableView.indexPath(for: selectedCell)!
+                dramaViewController.dramaId = favorites[(indexPath as NSIndexPath).row].dramaId
             }
         }
     }

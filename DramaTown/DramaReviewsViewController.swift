@@ -21,9 +21,9 @@ class DramaReviewsViewController: UITableViewController {
     
     func loadNewData() {
         if let dramaId = dramaId {
-            Alamofire.request(Router.DramaReviews(id: dramaId, page: 0)).validate().responseJSON { response in
+            Alamofire.request(Router.dramaReviews(id: dramaId, page: 0)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         self.reviews.removeAll()
@@ -32,11 +32,11 @@ class DramaReviewsViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
                 self.tableView.mj_header.endRefreshing()
@@ -46,9 +46,9 @@ class DramaReviewsViewController: UITableViewController {
     
     func loadMoreData() {
         if let dramaId = dramaId {
-            Alamofire.request(Router.DramaReviews(id: dramaId, page: currentPage + 1)).validate().responseJSON { response in
+            Alamofire.request(Router.dramaReviews(id: dramaId, page: currentPage + 1)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         for review in json["data"].arrayValue {
@@ -56,11 +56,11 @@ class DramaReviewsViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     self.tableView.mj_footer.endRefreshing()
                     print(error)
                 }
@@ -68,49 +68,49 @@ class DramaReviewsViewController: UITableViewController {
         }
     }
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return reviews.count
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 200
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ReviewCell", forIndexPath: indexPath) as! ReviewTableViewCell
-        let review = reviews[indexPath.row]
-        cell.userName.setTitle(review.user!.name, forState: UIControlState.Normal)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewCell", for: indexPath) as! ReviewTableViewCell
+        let review = reviews[(indexPath as NSIndexPath).row]
+        cell.userName.setTitle(review.user!.name, for: UIControlState())
         if let episode = review.episode {
-            cell.episodeTitle.setTitle(episode.title, forState: UIControlState.Normal)
-            cell.episodeTitle.hidden = false
+            cell.episodeTitle.setTitle(episode.title, for: UIControlState())
+            cell.episodeTitle.isHidden = false
         } else {
-            cell.episodeTitle.setTitle("", forState: UIControlState.Normal)
-            cell.episodeTitle.hidden = true
+            cell.episodeTitle.setTitle("", for: UIControlState())
+            cell.episodeTitle.isHidden = true
         }
         cell.createdAt.text = review.createdAt
         cell.title.text = review.title
         cell.content.text = review.content
-        cell.userName.tag = indexPath.row
-        cell.episodeTitle.tag = indexPath.row
+        cell.userName.tag = (indexPath as NSIndexPath).row
+        cell.episodeTitle.tag = (indexPath as NSIndexPath).row
         return cell
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowEpisode" {
-            let episodeViewController = segue.destinationViewController as! EpisodeViewController
+            let episodeViewController = segue.destination as! EpisodeViewController
             if let button = sender as? UIButton {
                 episodeViewController.episodeId = reviews[button.tag].episodeId
             }
         } else if segue.identifier == "ShowUser" {
-            let userViewController = segue.destinationViewController as! UserViewController
+            let userViewController = segue.destination as! UserViewController
             if let button = sender as? UIButton {
                 userViewController.userId = reviews[button.tag].userId
             }

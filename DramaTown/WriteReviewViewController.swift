@@ -18,47 +18,47 @@ class WriteReviewViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        content.layer.borderColor = UIColor.lightGrayColor().CGColor
+        content.layer.borderColor = UIColor.lightGray.cgColor
         content.layer.borderWidth = 1
         content.layer.cornerRadius = 6
     }
 
-    @IBAction func save(sender: UIBarButtonItem) {
+    @IBAction func save(_ sender: UIBarButtonItem) {
         let content = self.content.text ?? ""
         if content.isEmpty {
             info.text = "内容不能为空"
             return
         }
-        navigationItem.rightBarButtonItem?.enabled = false
+        navigationItem.rightBarButtonItem?.isEnabled = false
         info.text = "处理中……"
         let title = reviewTitle.text ?? ""
-        let visible = self.visible.on ? 1 : 0
-        Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+        let visible = self.visible.isOn ? 1 : 0
+        Alamofire.request(Router.getToken()).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let token = Token(json: JSON(value)).token
-                    Alamofire.request(Router.CreateReview(token: token, dramaId: self.dramaId!, episodeId: self.episodeId, title: title, content: content, visible: visible)).validate().responseJSON { response in
+                    Alamofire.request(Router.createReview(token: token, dramaId: self.dramaId!, episodeId: self.episodeId, title: title, content: content, visible: visible)).validate().responseJSON { response in
                         switch response.result {
-                        case .Success:
+                        case .success:
                             self.info.text = "保存成功"
-                            self.performSegueWithIdentifier(self.unwindSegueIdentifier, sender: nil)
-                        case .Failure(let error):
-                            self.navigationItem.rightBarButtonItem?.enabled = true
+                            self.performSegue(withIdentifier: self.unwindSegueIdentifier, sender: nil)
+                        case .failure(let error):
+                            self.navigationItem.rightBarButtonItem?.isEnabled = true
                             self.info.text = "保存失败"
                             print(error)
                         }
                     }
                 }
-            case .Failure(let error):
-                self.navigationItem.rightBarButtonItem?.enabled = true
+            case .failure(let error):
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
                 self.info.text = "保存失败"
                 print(error)
             }
         }
     }
     
-    @IBAction func cancel(sender: UIBarButtonItem) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        _ = navigationController?.popViewController(animated: true)
     }
 }

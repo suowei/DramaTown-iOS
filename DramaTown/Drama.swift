@@ -74,46 +74,46 @@ class Drama {
     var userTags: [TagMap]? = nil
     
     init(json: JSON) {
-        if json["id"] != nil {
+        if json["id"] != JSON.null {
             id = Int(json["id"].stringValue)!
         }
         title = json["title"].stringValue
         alias = json["alias"].stringValue
-        if json["type"] != nil {
+        if json["type"] != JSON.null {
             type = Int(json["type"].stringValue)!
         }
-        if json["era"] != nil {
+        if json["era"] != JSON.null {
             era = Int(json["era"].stringValue)!
         }
         genre = json["genre"].stringValue
         original = json["original"].stringValue == "1" ? true : false
-        if json["count"] != nil {
+        if json["count"] != JSON.null {
             count = Int(json["count"].stringValue)!
         }
-        if json["state"] != nil {
-            count = Int(json["state"].stringValue)!
+        if json["state"] != JSON.null {
+            state = Int(json["state"].stringValue)!
         }
         cv = json["sc"].stringValue
         introduction = json["introduction"].stringValue
-        if json["reviews"] != nil {
+        if json["reviews"] != JSON.null {
             reviews = Int(json["reviews"].stringValue)!
         }
-        if json["commtags"] != nil {
+        if json["commtags"] != JSON.null {
             commtags = [TagMap]()
             for tagmap in json["commtags"].arrayValue {
                 commtags?.append(TagMap(json: tagmap))
             }
         }
-        if json["episodes"] != nil {
+        if json["episodes"] != JSON.null {
             episodes = [Episode]()
             for episode in json["episodes"].arrayValue {
                 episodes?.append(Episode(json: episode))
             }
         }
-        if json["userFavorite"] != nil {
+        if json["userFavorite"] != JSON.null {
             userFavorite = Favorite(json: json["userFavorite"])
         }
-        if json["userTags"] != nil {
+        if json["userTags"] != JSON.null {
             userTags = [TagMap]()
             for tagmap in json["userTags"].arrayValue {
                 userTags?.append(TagMap(json: tagmap))

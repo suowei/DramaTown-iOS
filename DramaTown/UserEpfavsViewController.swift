@@ -33,19 +33,19 @@ class UserEpfavsViewController: UITableViewController {
     
     func loadNewData() {
         if let userId = userId {
-            Alamofire.request(Router.UserEpfavs(id: userId, type: type, page: 0)).validate().responseJSON { response in
+            Alamofire.request(Router.userEpfavs(id: userId, type: type, page: 0)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         self.epfavs = json["data"].arrayValue
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
                 self.tableView.mj_header.endRefreshing()
@@ -55,9 +55,9 @@ class UserEpfavsViewController: UITableViewController {
     
     func loadMoreData() {
         if let userId = userId {
-            Alamofire.request(Router.UserEpfavs(id: userId, type: type, page: currentPage + 1)).validate().responseJSON { response in
+            Alamofire.request(Router.userEpfavs(id: userId, type: type, page: currentPage + 1)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let json = JSON(value)
                         for epfav in json["data"].arrayValue {
@@ -65,11 +65,11 @@ class UserEpfavsViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                         self.currentPage = json["current_page"].intValue
-                        if json["next_page_url"] == nil {
+                        if json["next_page_url"] == JSON.null {
                             self.tableView.mj_footer.endRefreshingWithNoMoreData()
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     self.tableView.mj_footer.endRefreshing()
                     print(error)
                 }
@@ -77,42 +77,42 @@ class UserEpfavsViewController: UITableViewController {
         }
     }
 
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return epfavs.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("EpfavCell", forIndexPath: indexPath) as! UserEpfavsTableViewCell
-        let epfav = Epfav(json: epfavs[indexPath.row])
-        let episode = epfavs[indexPath.row]["episode"]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EpfavCell", for: indexPath) as! UserEpfavsTableViewCell
+        let epfav = Epfav(json: epfavs[(indexPath as NSIndexPath).row])
+        let episode = epfavs[(indexPath as NSIndexPath).row]["episode"]
         cell.title.text = "《\(episode["dramaTitle"].stringValue)》\(episode["title"].stringValue)"
         cell.duration.text = "\(episode["duration"].stringValue)'"
         cell.cv.text = episode["cv"].stringValue
         if epfav.rating > 0 {
             cell.rating.rating = epfav.rating
             cell.rating.text = epfav.ratingString
-            cell.rating.hidden = false
+            cell.rating.isHidden = false
         } else {
-            cell.rating.hidden = true
+            cell.rating.isHidden = true
         }
         cell.updatedAt.text = epfav.updatedAt
         return cell
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowEpisode" {
-            let episodeViewController = segue.destinationViewController as! EpisodeViewController
+            let episodeViewController = segue.destination as! EpisodeViewController
             if let selectedCell = sender as? UITableViewCell {
-                let indexPath = tableView.indexPathForCell(selectedCell)!
-                episodeViewController.episodeId = Int(epfavs[indexPath.row]["episode_id"].stringValue)
+                let indexPath = tableView.indexPath(for: selectedCell)!
+                episodeViewController.episodeId = Int(epfavs[(indexPath as NSIndexPath).row]["episode_id"].stringValue)
             }
         }
     }

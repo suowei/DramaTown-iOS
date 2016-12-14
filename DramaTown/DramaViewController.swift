@@ -20,16 +20,16 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.rowHeight = UITableViewAutomaticDimension
         
         if let dramaId = dramaId {
-            Alamofire.request(Router.ReadDrama(id: dramaId)).validate().responseJSON { response in
+            Alamofire.request(Router.readDrama(id: dramaId)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         self.drama = Drama(json: JSON(value))
                         self.navigationItem.title = self.drama!.title
                         self.testLogin()
                         self.tableView.reloadData()
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
             }
@@ -37,30 +37,30 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func testLogin() {
-        let panel = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as! DramaTableViewHeaderCell
-        panel.favoriteType.hidden = true
-        panel.ratingBar.hidden = true
-        panel.userTags.hidden = true
-        panel.userTagsLabel.hidden = true
-        panel.addFavAndReview.hidden = true
-        panel.editFavAndReview.hidden = true
-        panel.addFav.hidden = true
-        panel.editFav.hidden = true
-        panel.deleteFav.hidden = true
-        if NSUserDefaults.standardUserDefaults().valueForKey("UserId") != nil {
-            panel.login.hidden = true
-            panel.addReview.hidden = false
+        let panel = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as! DramaTableViewHeaderCell
+        panel.favoriteType.isHidden = true
+        panel.ratingBar.isHidden = true
+        panel.userTags.isHidden = true
+        panel.userTagsLabel.isHidden = true
+        panel.addFavAndReview.isHidden = true
+        panel.editFavAndReview.isHidden = true
+        panel.addFav.isHidden = true
+        panel.editFav.isHidden = true
+        panel.deleteFav.isHidden = true
+        if UserDefaults.standard.value(forKey: "UserId") != nil {
+            panel.login.isHidden = true
+            panel.addReview.isHidden = false
         } else {
-            panel.login.hidden = false
-            panel.addReview.hidden = true
+            panel.login.isHidden = false
+            panel.addReview.isHidden = true
         }
     }
 
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
         } else {
@@ -72,9 +72,9 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("HeaderCell", forIndexPath: indexPath) as! DramaTableViewHeaderCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if (indexPath as NSIndexPath).section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "HeaderCell", for: indexPath) as! DramaTableViewHeaderCell
             if let drama = drama {
                 cell.title.text = drama.title
                 cell.type.text = drama.typeString
@@ -92,27 +92,27 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                 }
                 cell.tags.text = commtags
-                cell.reviews.setTitle("评论 \(drama.reviews)", forState: UIControlState.Normal)
-                cell.addReview.enabled = true
+                cell.reviews.setTitle("评论 \(drama.reviews)", for: UIControlState())
+                cell.addReview.isEnabled = true
                 if drama.userFavorite != nil {
                     updateFavorite(cell, type: (drama.userFavorite?.type)!, rating: (drama.userFavorite?.rating)!, tags: (drama.userFavorite?.tags)!)
                 } else {
-                    cell.favoriteType.hidden = true
-                    cell.ratingBar.hidden = true
-                    cell.userTags.hidden = true
-                    cell.userTagsLabel.hidden = true
-                    cell.addFavAndReview.hidden = false
-                    cell.editFavAndReview.hidden = true
-                    cell.addFav.hidden = false
-                    cell.editFav.hidden = true
-                    cell.deleteFav.hidden = true
+                    cell.favoriteType.isHidden = true
+                    cell.ratingBar.isHidden = true
+                    cell.userTags.isHidden = true
+                    cell.userTagsLabel.isHidden = true
+                    cell.addFavAndReview.isHidden = false
+                    cell.editFavAndReview.isHidden = true
+                    cell.addFav.isHidden = false
+                    cell.editFav.isHidden = true
+                    cell.deleteFav.isHidden = true
                 }
             }
             return cell
         } else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("EpisodeCell", forIndexPath: indexPath) as! DramaTableViewEpisodeCell
-            if let episode = drama?.episodes![indexPath.row] {
-                cell.poster.kf_setImageWithURL(NSURL(string: episode.posterUrl)!)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "EpisodeCell", for: indexPath) as! DramaTableViewEpisodeCell
+            if let episode = drama?.episodes![(indexPath as NSIndexPath).row] {
+                cell.poster.kf.setImage(with: URL(string: episode.posterUrl)!)
                 cell.title.text = "\(episode.title) \(episode.alias)"
                 cell.releaseDate.text = episode.releaseDate
             }
@@ -120,7 +120,7 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
-    private func updateFavorite(cell: DramaTableViewHeaderCell, type: Int, rating: Double, tags: String) {
+    fileprivate func updateFavorite(_ cell: DramaTableViewHeaderCell, type: Int, rating: Double, tags: String) {
         if (drama?.userFavorite == nil) {
             drama?.userFavorite = Favorite(type: type, rating: rating, tags: tags)
         } else {
@@ -128,107 +128,107 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
             drama?.userFavorite?.rating = rating
             drama?.userFavorite?.tags = tags
         }
-        cell.addFavAndReview.hidden = true
-        cell.editFavAndReview.hidden = false
-        cell.addFav.hidden = true
-        cell.editFav.hidden = false
-        cell.deleteFav.hidden = false
+        cell.addFavAndReview.isHidden = true
+        cell.editFavAndReview.isHidden = false
+        cell.addFav.isHidden = true
+        cell.editFav.isHidden = false
+        cell.deleteFav.isHidden = false
         cell.favoriteType.text = drama?.userFavorite?.typeString
-        cell.favoriteType.hidden = false
+        cell.favoriteType.isHidden = false
         if drama?.userFavorite?.rating != 0 {
             cell.ratingBar.rating = (drama?.userFavorite?.rating)!
-            cell.ratingBar.hidden = false
+            cell.ratingBar.isHidden = false
         } else {
-            cell.ratingBar.hidden = true
+            cell.ratingBar.isHidden = true
         }
         let userTags = drama?.userFavorite?.tags
         if userTags != nil && !(userTags!.isEmpty) {
-            for tag in userTags!.componentsSeparatedByString(",") {
+            for tag in userTags!.components(separatedBy: ",") {
                 cell.userTags.addTag(tag)
             }
-            cell.userTags.hidden = false
-            cell.userTagsLabel.hidden = false
+            cell.userTags.isHidden = false
+            cell.userTagsLabel.isHidden = false
         } else {
-            cell.userTags.hidden = true
-            cell.userTagsLabel.hidden = true
+            cell.userTags.isHidden = true
+            cell.userTagsLabel.isHidden = true
         }
     }
     
-    @IBAction func deleteFavorite(sender: UIButton) {
-        let alertController = UIAlertController(title: "删除收藏", message: "确定要删除吗？", preferredStyle: .Alert)
-        let okAction = UIAlertAction(title: "确定", style: .Default, handler: { _ in
-            Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+    @IBAction func deleteFavorite(_ sender: UIButton) {
+        let alertController = UIAlertController(title: "删除收藏", message: "确定要删除吗？", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "确定", style: .default, handler: { _ in
+            Alamofire.request(Router.getToken()).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let token = Token(json: JSON(value)).token
-                        Alamofire.request(Router.DestroyFavorite(token: token, id: self.drama!.userFavorite!.id)).validate().responseJSON { response in
+                        Alamofire.request(Router.destroyFavorite(token: token, id: self.drama!.userFavorite!.id)).validate().responseJSON { response in
                             switch response.result {
-                            case .Success:
+                            case .success:
                                 self.drama?.userFavorite = nil
-                                let cell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as! DramaTableViewHeaderCell
-                                cell.favoriteType.hidden = true
-                                cell.ratingBar.hidden = true
-                                cell.userTags.hidden = true
-                                cell.userTagsLabel.hidden = true
-                                cell.addFavAndReview.hidden = false
-                                cell.editFavAndReview.hidden = true
-                                cell.addFav.hidden = false
-                                cell.editFav.hidden = true
-                                cell.deleteFav.hidden = true
-                            case .Failure(let error):
+                                let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as! DramaTableViewHeaderCell
+                                cell.favoriteType.isHidden = true
+                                cell.ratingBar.isHidden = true
+                                cell.userTags.isHidden = true
+                                cell.userTagsLabel.isHidden = true
+                                cell.addFavAndReview.isHidden = false
+                                cell.editFavAndReview.isHidden = true
+                                cell.addFav.isHidden = false
+                                cell.editFav.isHidden = true
+                                cell.deleteFav.isHidden = true
+                            case .failure(let error):
                                 print(error)
                             }
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
             }
         })
         alertController.addAction(okAction)
-        let cancelAction = UIAlertAction(title: "取消", style: .Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
-        self.presentViewController(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowReviews" {
-            let dramaReviewsViewController = segue.destinationViewController as! DramaReviewsViewController
+            let dramaReviewsViewController = segue.destination as! DramaReviewsViewController
             dramaReviewsViewController.dramaId = dramaId
         } else if segue.identifier == "ShowEpisode" {
-            let episodeViewController = segue.destinationViewController as! EpisodeViewController
+            let episodeViewController = segue.destination as! EpisodeViewController
             if let selectedCell = sender as? DramaTableViewEpisodeCell {
-                let indexPath = tableView.indexPathForCell(selectedCell)!
-                let selectedEpisode = drama?.episodes![indexPath.row]
+                let indexPath = tableView.indexPath(for: selectedCell)!
+                let selectedEpisode = drama?.episodes![(indexPath as NSIndexPath).row]
                 episodeViewController.episodeId = selectedEpisode?.id
             }
         } else if segue.identifier == "Login" {
-            let loginViewController = segue.destinationViewController as! LoginViewController
+            let loginViewController = segue.destination as! LoginViewController
             loginViewController.unwindSegueIdentifier = "UnwindToDramaViewController"
         } else if segue.identifier == "CreateReview" {
-            let writeReviewViewController = segue.destinationViewController as! WriteReviewViewController
+            let writeReviewViewController = segue.destination as! WriteReviewViewController
             writeReviewViewController.unwindSegueIdentifier = "UnwindToDramaViewController"
             writeReviewViewController.dramaId = dramaId
         } else if segue.identifier == "CreateFavorite" {
-            let favoriteViewController = segue.destinationViewController as! FavoriteViewController
+            let favoriteViewController = segue.destination as! FavoriteViewController
             favoriteViewController.favorite = Favorite(type: 1, rating: 0, tags: "")
             favoriteViewController.favorite?.dramaId = dramaId!
             favoriteViewController.userTags = drama?.userTags
         } else if segue.identifier == "EditFavorite" {
-            let favoriteViewController = segue.destinationViewController as! FavoriteViewController
+            let favoriteViewController = segue.destination as! FavoriteViewController
             let favorite = drama!.userFavorite!
             favoriteViewController.favorite = Favorite(type: favorite.type, rating: favorite.rating, tags: favorite.tags)
             favoriteViewController.favorite?.id = favorite.id
             favoriteViewController.userTags = drama?.userTags
             favoriteViewController.isUpdate = true
         } else if segue.identifier == "CreateFavoriteReview" {
-            let favoriteReviewViewController = segue.destinationViewController as! FavoriteReviewViewController
+            let favoriteReviewViewController = segue.destination as! FavoriteReviewViewController
             favoriteReviewViewController.favorite = Favorite(type: 1, rating: 0, tags: "")
             favoriteReviewViewController.favorite?.dramaId = dramaId!
             favoriteReviewViewController.userTags = drama?.userTags
         } else if segue.identifier == "EditFavoriteReview" {
-            let favoriteReviewViewController = segue.destinationViewController as! FavoriteReviewViewController
+            let favoriteReviewViewController = segue.destination as! FavoriteReviewViewController
             let favorite = drama!.userFavorite!
             favoriteReviewViewController.favorite = Favorite(type: favorite.type, rating: favorite.rating, tags: favorite.tags)
             favoriteReviewViewController.favorite?.id = favorite.id
@@ -238,18 +238,18 @@ class DramaViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
-    @IBAction func unwindToDramaViewController(sender: UIStoryboardSegue) {
-        if (sender.sourceViewController as? LoginViewController) != nil {
+    @IBAction func unwindToDramaViewController(_ sender: UIStoryboardSegue) {
+        if (sender.source as? LoginViewController) != nil {
             testLogin()
-        } else if (sender.sourceViewController as? WriteReviewViewController) != nil {
+        } else if (sender.source as? WriteReviewViewController) != nil {
             drama?.reviews += 1
-            let panel = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as! DramaTableViewHeaderCell
-            panel.reviews.setTitle("评论 \(drama!.reviews)", forState: UIControlState.Normal)
-        } else if let sourceViewController = sender.sourceViewController as? FavoriteViewController, favorite = sourceViewController.favorite {
-            let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as! DramaTableViewHeaderCell
+            let panel = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as! DramaTableViewHeaderCell
+            panel.reviews.setTitle("评论 \(drama!.reviews)", for: UIControlState())
+        } else if let sourceViewController = sender.source as? FavoriteViewController, let favorite = sourceViewController.favorite {
+            let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as! DramaTableViewHeaderCell
             updateFavorite(cell, type: favorite.type, rating: favorite.rating, tags: favorite.tags)
-        } else if let sourceViewController = sender.sourceViewController as? FavoriteReviewViewController, favorite = sourceViewController.favorite {
-            let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as! DramaTableViewHeaderCell
+        } else if let sourceViewController = sender.source as? FavoriteReviewViewController, let favorite = sourceViewController.favorite {
+            let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as! DramaTableViewHeaderCell
             updateFavorite(cell, type: favorite.type, rating: favorite.rating, tags: favorite.tags)
         }
     }
