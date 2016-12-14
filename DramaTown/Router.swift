@@ -2,221 +2,239 @@ import Foundation
 import Alamofire
 
 enum Router: URLRequestConvertible {
-    static let baseURLString = "http://saoju.net/api/"
+    static let baseURLString = "https://saoju.net/api/"
     
-    case GetNewEpisodes(page: Int)
+    case getNewEpisodes(page: Int)
     
-    case ReadEpisode(id: Int)
-    case EpisodeReviews(id: Int, page: Int)
+    case readEpisode(id: Int)
+    case episodeReviews(id: Int, page: Int)
     
-    case DramaIndex(page: Int)
-    case ReadDrama(id: Int)
-    case DramaReviews(id: Int, page: Int)
+    case dramaIndex(page: Int)
+    case readDrama(id: Int)
+    case dramaReviews(id: Int, page: Int)
     
-    case ReviewIndex(page: Int)
-    case CreateReview(token: String, dramaId: Int, episodeId: Int?, title: String, content: String, visible: Int)
+    case reviewIndex(page: Int)
+    case createReview(token: String, dramaId: Int, episodeId: Int?, title: String, content: String, visible: Int)
+    case updateReview(token: String, reviewId: Int, title: String, content: String, visible: Int)
+    case destroyReview(token: String, reviewId: Int)
     
-    case ReadUser(id: Int)
-    case UserEpfavs(id: Int, type: Int, page: Int)
-    case UserFavorites(id: Int, type: Int, page: Int)
-    case UserReviews(id: Int, page: Int)
+    case readUser(id: Int)
+    case userEpfavs(id: Int, type: Int, page: Int)
+    case userFavorites(id: Int, type: Int, page: Int)
+    case userReviews(id: Int, page: Int)
     
-    case Search(keyword: String)
+    case search(keyword: String)
     
-    case GetToken()
+    case getToken()
     
-    case Login(token: String, email: String, password: String, remember: String)
+    case login(token: String, email: String, password: String, remember: String)
     
-    case CreateEpfav(token: String, episodeId: Int, type: Int, rating: Double)
-    case UpdateEpfav(token: String, episodeId: Int, type: Int, rating: Double)
-    case DestroyEpfav(token: String, episodeId: Int)
-    case CreateEpfavReview(token: String, episodeId: Int, dramaId: Int, type: Int, rating: Double,
+    case createEpfav(token: String, episodeId: Int, type: Int, rating: Double)
+    case updateEpfav(token: String, episodeId: Int, type: Int, rating: Double)
+    case destroyEpfav(token: String, episodeId: Int)
+    case createEpfavReview(token: String, episodeId: Int, dramaId: Int, type: Int, rating: Double,
         title: String, content: String, visible: Int)
-    case EditEpfavReview(episodeId: Int)
-    case UpdateEpfavReview(token: String, episodeId: Int, dramaId: Int, type: Int, rating: Double,
-        title: String, content: String, visible: Int)
-    
-    case CreateFavorite(token: String, dramaId: Int, type: Int, rating: Double, tags: String)
-    case UpdateFavorite(token: String, id: Int, type: Int, rating: Double, tags: String)
-    case DestroyFavorite(token: String, id: Int)
-    case CreateFavoriteReview(token: String, dramaId: Int, type: Int, rating: Double, tags: String,
-        title: String, content: String, visible: Int)
-    case EditFavoriteReview(dramaId: Int)
-    case UpdateFavoriteReview(token: String, dramaId: Int, type: Int, rating: Double, tags: String,
+    case editEpfavReview(episodeId: Int)
+    case updateEpfavReview(token: String, episodeId: Int, dramaId: Int, type: Int, rating: Double,
         title: String, content: String, visible: Int)
     
-    var method: Alamofire.Method {
+    case createFavorite(token: String, dramaId: Int, type: Int, rating: Double, tags: String)
+    case updateFavorite(token: String, id: Int, type: Int, rating: Double, tags: String)
+    case destroyFavorite(token: String, id: Int)
+    case createFavoriteReview(token: String, dramaId: Int, type: Int, rating: Double, tags: String,
+        title: String, content: String, visible: Int)
+    case editFavoriteReview(dramaId: Int)
+    case updateFavoriteReview(token: String, dramaId: Int, type: Int, rating: Double, tags: String,
+        title: String, content: String, visible: Int)
+    
+    var method: HTTPMethod {
         switch self {
-        case .GetNewEpisodes:
-            return .GET
-        case .ReadEpisode:
-            return .GET
-        case .EpisodeReviews:
-            return .GET
-        case .DramaIndex:
-            return .GET
-        case .ReadDrama:
-            return .GET
-        case .DramaReviews:
-            return .GET
-        case .ReviewIndex:
-            return .GET
-        case .CreateReview:
-            return .POST
-        case .ReadUser:
-            return .GET
-        case .UserEpfavs:
-            return .GET
-        case .UserFavorites:
-            return .GET
-        case .UserReviews:
-            return .GET
-        case .Search:
-            return .GET
-        case .GetToken:
-            return .GET
-        case .Login:
-            return .POST
-        case .CreateEpfav:
-            return .POST
-        case .UpdateEpfav:
-            return .PUT
-        case .DestroyEpfav:
-            return .DELETE
-        case .CreateEpfavReview:
-            return .POST
-        case .EditEpfavReview:
-            return .GET
-        case .UpdateEpfavReview:
-            return .PUT
-        case .CreateFavorite:
-            return .POST
-        case .UpdateFavorite:
-            return .PUT
-        case .DestroyFavorite:
-            return .DELETE
-        case .CreateFavoriteReview:
-            return .POST
-        case .EditFavoriteReview:
-            return .GET
-        case .UpdateFavoriteReview:
-            return .PUT
+        case .getNewEpisodes:
+            return .get
+        case .readEpisode:
+            return .get
+        case .episodeReviews:
+            return .get
+        case .dramaIndex:
+            return .get
+        case .readDrama:
+            return .get
+        case .dramaReviews:
+            return .get
+        case .reviewIndex:
+            return .get
+        case .createReview:
+            return .post
+        case .updateReview:
+            return .put
+        case .destroyReview:
+            return .delete
+        case .readUser:
+            return .get
+        case .userEpfavs:
+            return .get
+        case .userFavorites:
+            return .get
+        case .userReviews:
+            return .get
+        case .search:
+            return .get
+        case .getToken:
+            return .get
+        case .login:
+            return .post
+        case .createEpfav:
+            return .post
+        case .updateEpfav:
+            return .put
+        case .destroyEpfav:
+            return .delete
+        case .createEpfavReview:
+            return .post
+        case .editEpfavReview:
+            return .get
+        case .updateEpfavReview:
+            return .put
+        case .createFavorite:
+            return .post
+        case .updateFavorite:
+            return .put
+        case .destroyFavorite:
+            return .delete
+        case .createFavoriteReview:
+            return .post
+        case .editFavoriteReview:
+            return .get
+        case .updateFavoriteReview:
+            return .put
         }
     }
     
     var path: String {
         switch self {
-        case .GetNewEpisodes:
+        case .getNewEpisodes:
             return "newepisodes"
-        case .ReadEpisode(let id):
+        case .readEpisode(let id):
             return "episode/\(id)"
-        case .EpisodeReviews(let id, _):
+        case .episodeReviews(let id, _):
             return "episode/\(id)/reviews"
-        case .DramaIndex:
+        case .dramaIndex:
             return "drama"
-        case .ReadDrama(let id):
+        case .readDrama(let id):
             return "drama/\(id)"
-        case .DramaReviews(let id, _):
+        case .dramaReviews(let id, _):
             return "drama/\(id)/reviews"
-        case .ReviewIndex:
+        case .reviewIndex:
             return "review"
-        case .CreateReview:
+        case .createReview:
             return "review"
-        case .ReadUser(let id):
+        case .updateReview(_, let id, _, _, _):
+            return "review/\(id)"
+        case .destroyReview(_, let id):
+            return "review/\(id)"
+        case .readUser(let id):
             return "user/\(id)"
-        case .UserEpfavs(let id, let type, _):
+        case .userEpfavs(let id, let type, _):
             return "user/\(id)/epfavs/\(type)"
-        case .UserFavorites(let id, let type, _):
+        case .userFavorites(let id, let type, _):
             return "user/\(id)/favorites/\(type)"
-        case .UserReviews(let id, _):
+        case .userReviews(let id, _):
             return "user/\(id)/reviews"
-        case .Search:
+        case .search:
             return "search"
-        case .GetToken:
+        case .getToken:
             return "csrftoken"
-        case .Login:
+        case .login:
             return "auth/login"
-        case .CreateEpfav:
+        case .createEpfav:
             return "epfav"
-        case .UpdateEpfav(_, let episodeId, _, _):
+        case .updateEpfav(_, let episodeId, _, _):
             return "epfav/\(episodeId)"
-        case .DestroyEpfav(_, let episodeId):
+        case .destroyEpfav(_, let episodeId):
             return "epfav/\(episodeId)"
-        case .CreateEpfavReview:
+        case .createEpfavReview:
             return "epfav2"
-        case .UpdateEpfavReview(_, let episodeId, _, _, _, _, _, _):
+        case .updateEpfavReview(_, let episodeId, _, _, _, _, _, _):
             return "epfav2/\(episodeId)"
-        case .EditEpfavReview(let episodeId):
+        case .editEpfavReview(let episodeId):
             return "epfav/\(episodeId)/edit"
-        case .CreateFavorite:
+        case .createFavorite:
             return "favorite"
-        case .UpdateFavorite(_, let id, _, _, _):
+        case .updateFavorite(_, let id, _, _, _):
             return "favorite/\(id)"
-        case .DestroyFavorite(_, let id):
+        case .destroyFavorite(_, let id):
             return "favorite/\(id)"
-        case .CreateFavoriteReview:
+        case .createFavoriteReview:
             return "favorite2"
-        case .UpdateFavoriteReview(_, let dramaId, _, _, _, _, _, _):
+        case .updateFavoriteReview(_, let dramaId, _, _, _, _, _, _):
             return "favorite2/\(dramaId)"
-        case .EditFavoriteReview(let dramaId):
+        case .editFavoriteReview(let dramaId):
             return "favorite/\(dramaId)/edit"
         }
     }
     
-    var URLRequest: NSMutableURLRequest {
-        let URL = NSURL(string: Router.baseURLString)!
-        let mutableURLRequest = NSMutableURLRequest(URL: URL.URLByAppendingPathComponent(path))
-        mutableURLRequest.HTTPMethod = method.rawValue
+    func asURLRequest() throws -> URLRequest {
+        let url = try Router.baseURLString.asURL()
+        
+        var urlRequest = URLRequest(url: url.appendingPathComponent(path))
+        urlRequest.httpMethod = method.rawValue
         
         switch self {
-        case .GetNewEpisodes(let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .DramaIndex(let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .ReviewIndex(let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .CreateReview(let token, let dramaId, let episodeId, let title, let content, let visible):
+        case .getNewEpisodes(let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .dramaIndex(let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .reviewIndex(let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .createReview(let token, let dramaId, let episodeId, let title, let content, let visible):
             if let episodeId = episodeId {
-                return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "drama_id": dramaId, "episode_id": episodeId, "title": title, "content": content, "visible": visible]).0
+                urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "drama_id": dramaId, "episode_id": episodeId, "title": title, "content": content, "visible": visible])
             } else {
-                return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "drama_id": dramaId, "title": title, "content": content, "visible": visible]).0
+                urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "drama_id": dramaId, "title": title, "content": content, "visible": visible])
             }
-        case .EpisodeReviews(_, let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .DramaReviews(_, let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .UserEpfavs(_, _, let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .UserFavorites(_, _, let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .UserReviews(_, let page):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["page": page]).0
-        case .Search(let keyword):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["keyword": keyword]).0
-        case .Login(let token, let email, let password, let remember):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "email": email, "password": password, "remember": remember]).0
-        case .CreateEpfav(let token, let episodeId, let type, let rating):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "episode_id": episodeId, "type": type, "rating": rating]).0
-        case .UpdateEpfav(let token, _, let type, let rating):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "type": type, "rating": rating]).0
-        case .DestroyEpfav(let token, _):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token]).0
-        case .CreateEpfavReview(let token, let episodeId, let dramaId, let type, let rating, let title, let content, let visible):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "episode_id": episodeId, "drama_id": dramaId, "type": type, "rating": rating, "title": title, "content": content, "visible": visible]).0
-        case .UpdateEpfavReview(let token, _, let dramaId, let type, let rating, let title, let content, let visible):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "title": title, "content": content, "visible": visible]).0
-        case .CreateFavorite(let token, let dramaId, let type, let rating, let tags):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "tags": tags]).0
-        case .UpdateFavorite(let token, _, let type, let rating, let tags):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "type": type, "rating": rating, "tags": tags]).0
-        case .DestroyFavorite(let token, _):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token]).0
-        case .CreateFavoriteReview(let token, let dramaId, let type, let rating, let tags, let title, let content, let visible):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "tags": tags, "title": title, "content": content, "visible": visible]).0
-        case .UpdateFavoriteReview(let token, _, let type, let rating, let tags, let title, let content, let visible):
-            return Alamofire.ParameterEncoding.URL.encode(mutableURLRequest, parameters: ["_token": token, "type": type, "rating": rating, "tags": tags, "title": title, "content": content, "visible": visible]).0
+        case .updateReview(let token, _, let title, let content, let visible):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "title": title, "content": content, "tags": visible])
+        case .destroyReview(let token, _):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token])
+        case .episodeReviews(_, let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .dramaReviews(_, let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .userEpfavs(_, _, let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .userFavorites(_, _, let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .userReviews(_, let page):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["page": page])
+        case .search(let keyword):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["keyword": keyword])
+        case .login(let token, let email, let password, let remember):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "email": email, "password": password, "remember": remember])
+        case .createEpfav(let token, let episodeId, let type, let rating):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "episode_id": episodeId, "type": type, "rating": rating])
+        case .updateEpfav(let token, _, let type, let rating):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "type": type, "rating": rating])
+        case .destroyEpfav(let token, _):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token])
+        case .createEpfavReview(let token, let episodeId, let dramaId, let type, let rating, let title, let content, let visible):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "episode_id": episodeId, "drama_id": dramaId, "type": type, "rating": rating, "title": title, "content": content, "visible": visible])
+        case .updateEpfavReview(let token, _, let dramaId, let type, let rating, let title, let content, let visible):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "title": title, "content": content, "visible": visible])
+        case .createFavorite(let token, let dramaId, let type, let rating, let tags):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "tags": tags])
+        case .updateFavorite(let token, _, let type, let rating, let tags):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "type": type, "rating": rating, "tags": tags])
+        case .destroyFavorite(let token, _):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token])
+        case .createFavoriteReview(let token, let dramaId, let type, let rating, let tags, let title, let content, let visible):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "drama_id": dramaId, "type": type, "rating": rating, "tags": tags, "title": title, "content": content, "visible": visible])
+        case .updateFavoriteReview(let token, _, let type, let rating, let tags, let title, let content, let visible):
+            urlRequest = try URLEncoding.default.encode(urlRequest, with: ["_token": token, "type": type, "rating": rating, "tags": tags, "title": title, "content": content, "visible": visible])
         default:
-            return mutableURLRequest
+            break
         }
+        
+        return urlRequest
     }
+    
 }

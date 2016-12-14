@@ -52,13 +52,13 @@ class Epfav {
     var episode: Episode? = nil
     
     init(json: JSON) {
-        if json["episode_id"] != nil {
+        if json["episode_id"] != JSON.null {
             episodeId = Int(json["episode_id"].stringValue)!
         }
         type = Int(json["type"].stringValue)!
         rating = Double(json["rating"].stringValue)!
         updatedAt = json["updated_at"].stringValue
-        if json["episode"] != nil {
+        if json["episode"] != JSON.null {
             episode = Episode(json: json["episode"])
         }
     }

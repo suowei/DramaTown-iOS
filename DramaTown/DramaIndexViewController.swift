@@ -19,9 +19,9 @@ class DramaIndexViewController: UITableViewController {
     }
     
     func loadNewData() {
-        Alamofire.request(Router.DramaIndex(page: 0)).validate().responseJSON { response in
+        Alamofire.request(Router.dramaIndex(page: 0)).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let json = JSON(value)
                     self.dramas.removeAll()
@@ -31,7 +31,7 @@ class DramaIndexViewController: UITableViewController {
                     self.tableView.reloadData()
                     self.currentPage = json["current_page"].intValue
                 }
-            case .Failure(let error):
+            case .failure(let error):
                 print(error)
             }
             self.tableView.mj_header.endRefreshing()
@@ -39,9 +39,9 @@ class DramaIndexViewController: UITableViewController {
     }
     
     func loadMoreData() {
-        Alamofire.request(Router.DramaIndex(page: currentPage + 1)).validate().responseJSON { response in
+        Alamofire.request(Router.dramaIndex(page: currentPage + 1)).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let json = JSON(value)
                     for drama in json["data"].arrayValue {
@@ -50,24 +50,24 @@ class DramaIndexViewController: UITableViewController {
                     self.tableView.reloadData()
                     self.currentPage = json["current_page"].intValue
                 }
-            case .Failure(let error):
+            case .failure(let error):
                 print(error)
             }
             self.tableView.mj_footer.endRefreshing()
         }
     }
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dramas.count
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("DramaCell", forIndexPath: indexPath)
-        let drama = dramas[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DramaCell", for: indexPath)
+        let drama = dramas[(indexPath as NSIndexPath).row]
         cell.textLabel?.text = drama.title
         var info = "\(drama.cv)\n\(drama.typeString)，\(drama.eraString)"
         if drama.genre != "" {
@@ -78,12 +78,12 @@ class DramaIndexViewController: UITableViewController {
         return cell
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDrama" {
-            let dramaViewController = segue.destinationViewController as! DramaViewController
+            let dramaViewController = segue.destination as! DramaViewController
             if let selectedCell = sender as? UITableViewCell {
-                let indexPath = tableView.indexPathForCell(selectedCell)!
-                let selectedDrama = dramas[indexPath.row]
+                let indexPath = tableView.indexPath(for: selectedCell)!
+                let selectedDrama = dramas[(indexPath as NSIndexPath).row]
                 dramaViewController.dramaId = selectedDrama.id
             }
         }

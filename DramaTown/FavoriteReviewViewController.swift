@@ -24,7 +24,7 @@ class FavoriteReviewViewController: UIViewController, TagListViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tags.layer.borderColor = UIColor.lightGrayColor().CGColor
+        tags.layer.borderColor = UIColor.lightGray.cgColor
         tags.layer.borderWidth = 1
         tags.layer.cornerRadius = 6
         commonTags.delegate = self
@@ -33,7 +33,7 @@ class FavoriteReviewViewController: UIViewController, TagListViewDelegate {
                 commonTags.addTag(tagmap.tag!.name)
             }
         }
-        content.layer.borderColor = UIColor.lightGrayColor().CGColor
+        content.layer.borderColor = UIColor.lightGray.cgColor
         content.layer.borderWidth = 1
         content.layer.cornerRadius = 6
         
@@ -43,103 +43,103 @@ class FavoriteReviewViewController: UIViewController, TagListViewDelegate {
                 type.selectedSegmentIndex = favorite.type
                 typeChanged(type)
                 rating.rating = favorite.rating
-                tags.setStringItems(favorite.tags.componentsSeparatedByString(","))
+                tags.setStringItems(items: favorite.tags.components(separatedBy: ","))
             }
-            navigationItem.rightBarButtonItem?.enabled = false
+            navigationItem.rightBarButtonItem?.isEnabled = false
             infoLabel.text = "读取评论"
-            infoLabel.hidden = false
-            Alamofire.request(Router.EditFavoriteReview(dramaId: favorite!.dramaId)).validate().responseJSON { response in
+            infoLabel.isHidden = false
+            Alamofire.request(Router.editFavoriteReview(dramaId: favorite!.dramaId)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let review = Review(json: JSON(value))
                         self.reviewTitle.text = review.title
                         self.content.text = review.content
-                        self.visible.on = (review.visible == 1)
-                        self.navigationItem.rightBarButtonItem?.enabled = true
-                        self.infoLabel.hidden = true
+                        self.visible.isOn = (review.visible == 1)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = true
+                        self.infoLabel.isHidden = true
                     }
-                case .Failure:
-                    self.navigationItem.rightBarButtonItem?.enabled = true
-                    self.infoLabel.hidden = true
+                case .failure:
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    self.infoLabel.isHidden = true
                 }
             }
         }
     }
 
-    @IBAction func save(sender: UIBarButtonItem) {
+    @IBAction func save(_ sender: UIBarButtonItem) {
         let title = reviewTitle.text ?? ""
         let content = self.content.text ?? ""
         if !title.isEmpty && content.isEmpty {
             infoLabel.text = "内容不能为空"
             return
         }
-        navigationItem.rightBarButtonItem?.enabled = false
+        navigationItem.rightBarButtonItem?.isEnabled = false
         favorite!.type = type.selectedSegmentIndex
         favorite!.rating = rating.rating
-        favorite!.tags = tags.stringItems().joinWithSeparator(",")
+        favorite!.tags = tags.stringItems().joined(separator: ",")
         infoLabel.text = "处理中……"
-        infoLabel.hidden = false
-        let visible = self.visible.on ? 1 : 0
-        Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+        infoLabel.isHidden = false
+        let visible = self.visible.isOn ? 1 : 0
+        Alamofire.request(Router.getToken()).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let token = Token(json: JSON(value)).token
                     if self.isUpdate {
-                        Alamofire.request(Router.UpdateFavoriteReview(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags, title: title, content: content, visible: visible)).validate().responseJSON { response in
+                        Alamofire.request(Router.updateFavoriteReview(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags, title: title, content: content, visible: visible)).validate().responseJSON { response in
                             switch response.result {
-                            case .Success:
+                            case .success:
                                 self.infoLabel.text = "保存成功"
-                                self.performSegueWithIdentifier("UnwindToDramaViewController", sender: nil)
-                            case .Failure(let error):
-                                self.navigationItem.rightBarButtonItem?.enabled = true
+                                self.performSegue(withIdentifier: "UnwindToDramaViewController", sender: nil)
+                            case .failure(let error):
+                                self.navigationItem.rightBarButtonItem?.isEnabled = true
                                 self.infoLabel.text = "保存失败"
                                 print(error)
                             }
                         }
                     } else {
-                        Alamofire.request(Router.CreateFavoriteReview(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags, title: title, content: content, visible: visible)).validate().responseJSON { response in
+                        Alamofire.request(Router.createFavoriteReview(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags, title: title, content: content, visible: visible)).validate().responseJSON { response in
                             switch response.result {
-                            case .Success:
+                            case .success:
                                 self.infoLabel.text = "保存成功"
-                                self.performSegueWithIdentifier("UnwindToDramaViewController", sender: nil)
-                            case .Failure(let error):
-                                self.navigationItem.rightBarButtonItem?.enabled = true
+                                self.performSegue(withIdentifier: "UnwindToDramaViewController", sender: nil)
+                            case .failure(let error):
+                                self.navigationItem.rightBarButtonItem?.isEnabled = true
                                 self.infoLabel.text = "保存失败"
                                 print(error)
                             }
                         }
                     }
                 }
-            case .Failure(let error):
-                self.navigationItem.rightBarButtonItem?.enabled = true
+            case .failure(let error):
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
                 self.infoLabel.text = "保存失败"
                 print(error)
             }
         }
     }
     
-    @IBAction func cancel(sender: UIBarButtonItem) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        _ = navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func typeChanged(sender: UISegmentedControl) {
+    @IBAction func typeChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            rating.hidden = true
-            clearButton.hidden = true
+            rating.isHidden = true
+            clearButton.isHidden = true
         } else {
-            rating.hidden = false
-            clearButton.hidden = false
+            rating.isHidden = false
+            clearButton.isHidden = false
         }
     }
     
-    @IBAction func clearRating(sender: UIButton) {
+    @IBAction func clearRating(_ sender: UIButton) {
         rating.rating = 0
     }
     
-    func tagPressed(title: String, tagView: TagView, sender: TagListView) {
-        tags.addStringItem(title)
+    func tagPressed(_ title: String, tagView: TagView, sender: TagListView) {
+        _ = tags.addStringItem(text: title)
     }
 
 }

@@ -19,7 +19,7 @@ class EpfavReviewViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        content.layer.borderColor = UIColor.lightGrayColor().CGColor
+        content.layer.borderColor = UIColor.lightGray.cgColor
         content.layer.borderWidth = 1
         content.layer.cornerRadius = 6
 
@@ -30,95 +30,95 @@ class EpfavReviewViewController: UIViewController {
                 typeChanged(type)
                 rating.rating = epfav.rating
             }
-            navigationItem.rightBarButtonItem?.enabled = false
+            navigationItem.rightBarButtonItem?.isEnabled = false
             infoLabel.text = "读取评论"
-            infoLabel.hidden = false
-            Alamofire.request(Router.EditEpfavReview(episodeId: epfav!.episodeId)).validate().responseJSON { response in
+            infoLabel.isHidden = false
+            Alamofire.request(Router.editEpfavReview(episodeId: epfav!.episodeId)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let review = Review(json: JSON(value))
                         self.reviewTitle.text = review.title
                         self.content.text = review.content
-                        self.visible.on = (review.visible == 1)
-                        self.navigationItem.rightBarButtonItem?.enabled = true
-                        self.infoLabel.hidden = true
+                        self.visible.isOn = (review.visible == 1)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = true
+                        self.infoLabel.isHidden = true
                     }
-                case .Failure:
-                    self.navigationItem.rightBarButtonItem?.enabled = true
-                    self.infoLabel.hidden = true
+                case .failure:
+                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    self.infoLabel.isHidden = true
                 }
             }
         }
     }
     
-    @IBAction func save(sender: UIBarButtonItem) {
+    @IBAction func save(_ sender: UIBarButtonItem) {
         let title = reviewTitle.text ?? ""
         let content = self.content.text ?? ""
         if !title.isEmpty && content.isEmpty {
             infoLabel.text = "内容不能为空"
             return
         }
-        navigationItem.rightBarButtonItem?.enabled = false
+        navigationItem.rightBarButtonItem?.isEnabled = false
         epfav!.type = type.selectedSegmentIndex * 2
         epfav!.rating = rating.rating
         infoLabel.text = "处理中……"
-        infoLabel.hidden = false
-        let visible = self.visible.on ? 1 : 0
-        Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+        infoLabel.isHidden = false
+        let visible = self.visible.isOn ? 1 : 0
+        Alamofire.request(Router.getToken()).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let token = Token(json: JSON(value)).token
                     if self.isUpdate {
-                        Alamofire.request(Router.UpdateEpfavReview(token: token, episodeId: self.epfav!.episodeId, dramaId: self.dramaId!, type: self.epfav!.type, rating: self.epfav!.rating, title: title, content: content, visible: visible)).validate().responseJSON { response in
+                        Alamofire.request(Router.updateEpfavReview(token: token, episodeId: self.epfav!.episodeId, dramaId: self.dramaId!, type: self.epfav!.type, rating: self.epfav!.rating, title: title, content: content, visible: visible)).validate().responseJSON { response in
                                 switch response.result {
-                                case .Success:
+                                case .success:
                                     self.infoLabel.text = "保存成功"
-                                    self.performSegueWithIdentifier("UnwindToEpisodeViewController", sender: nil)
-                                case .Failure(let error):
-                                    self.navigationItem.rightBarButtonItem?.enabled = true
+                                    self.performSegue(withIdentifier: "UnwindToEpisodeViewController", sender: nil)
+                                case .failure(let error):
+                                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                                     self.infoLabel.text = "保存失败"
                                     print(error)
                                 }
                         }
                     } else {
-                        Alamofire.request(Router.CreateEpfavReview(token: token, episodeId: self.epfav!.episodeId, dramaId: self.dramaId!, type: self.epfav!.type, rating: self.epfav!.rating, title: title, content: content, visible: visible)).validate().responseJSON { response in
+                        Alamofire.request(Router.createEpfavReview(token: token, episodeId: self.epfav!.episodeId, dramaId: self.dramaId!, type: self.epfav!.type, rating: self.epfav!.rating, title: title, content: content, visible: visible)).validate().responseJSON { response in
                                 switch response.result {
-                                case .Success:
+                                case .success:
                                     self.infoLabel.text = "保存成功"
-                                    self.performSegueWithIdentifier("UnwindToEpisodeViewController", sender: nil)
-                                case .Failure(let error):
-                                    self.navigationItem.rightBarButtonItem?.enabled = true
+                                    self.performSegue(withIdentifier: "UnwindToEpisodeViewController", sender: nil)
+                                case .failure(let error):
+                                    self.navigationItem.rightBarButtonItem?.isEnabled = true
                                     self.infoLabel.text = "保存失败"
                                     print(error)
                                 }
                         }
                     }
                 }
-            case .Failure(let error):
-                self.navigationItem.rightBarButtonItem?.enabled = true
+            case .failure(let error):
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
                 self.infoLabel.text = "保存失败"
                 print(error)
             }
         }
     }
     
-    @IBAction func cancel(sender: UIBarButtonItem) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        _ = navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func typeChanged(sender: UISegmentedControl) {
+    @IBAction func typeChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            rating.hidden = true
-            clearButton.hidden = true
+            rating.isHidden = true
+            clearButton.isHidden = true
         } else {
-            rating.hidden = false
-            clearButton.hidden = false
+            rating.isHidden = false
+            clearButton.isHidden = false
         }
     }
     
-    @IBAction func clearRating(sender: UIButton) {
+    @IBAction func clearRating(_ sender: UIButton) {
         rating.rating = 0
     }
 

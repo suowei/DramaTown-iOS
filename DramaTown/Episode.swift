@@ -18,10 +18,10 @@ class Episode {
     var userFavorite: Epfav? = nil
     
     init(json: JSON) {
-        if json["id"] != nil {
+        if json["id"] != JSON.null {
             id = Int(json["id"].stringValue)!
         }
-        if json["drama_id"] != nil {
+        if json["drama_id"] != JSON.null {
             dramaId = Int(json["drama_id"].stringValue)!
         }
         title = json["title"].stringValue
@@ -29,18 +29,18 @@ class Episode {
         releaseDate = json["release_date"].stringValue
         url = json["url"].stringValue
         sc = json["sc"].stringValue
-        if json["duration"] != nil {
+        if json["duration"] != JSON.null {
             duration = Int(json["duration"].stringValue)!
         }
         posterUrl = json["poster_url"].stringValue
         introduction = json["introduction"].stringValue
-        if json["reviews"] != nil {
+        if json["reviews"] != JSON.null {
             reviews = Int(json["reviews"].stringValue)!
         }
-        if json["drama"] != nil {
+        if json["drama"] != JSON.null {
             drama = Drama(json: json["drama"])
         }
-        if json["userFavorite"] != nil {
+        if json["userFavorite"] != JSON.null {
             userFavorite = Epfav(json: json["userFavorite"])
         }
     }

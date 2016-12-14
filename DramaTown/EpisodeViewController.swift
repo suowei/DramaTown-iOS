@@ -38,14 +38,14 @@ class EpisodeViewController: UITableViewController {
         url.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 
         if let episodeId = episodeId {
-            Alamofire.request(Router.ReadEpisode(id: episodeId)).validate().responseJSON { response in
+            Alamofire.request(Router.readEpisode(id: episodeId)).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         self.episode = Episode(json: JSON(value))
                         self.setUpViews()
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
             }
@@ -55,42 +55,42 @@ class EpisodeViewController: UITableViewController {
     }
     
     func testLogin() {
-        favoriteType.hidden = true
-        ratingBar.hidden = true
-        addFavAndReview.hidden = true
-        editFavAndReview.hidden = true
-        addFavorite.hidden = true
-        editFavorite.hidden = true
-        deleteFavorite.hidden = true
+        favoriteType.isHidden = true
+        ratingBar.isHidden = true
+        addFavAndReview.isHidden = true
+        editFavAndReview.isHidden = true
+        addFavorite.isHidden = true
+        editFavorite.isHidden = true
+        deleteFavorite.isHidden = true
         
-        if NSUserDefaults.standardUserDefaults().valueForKey("UserId") != nil {
-            login.hidden = true
-            addReview.hidden = false
+        if UserDefaults.standard.value(forKey: "UserId") != nil {
+            login.isHidden = true
+            addReview.isHidden = false
         } else {
-            login.hidden = false
-            addReview.hidden = true
+            login.isHidden = false
+            addReview.isHidden = true
         }
     }
     
     func setUpViews() {
         if let episode = episode {
             navigationItem.title = "《\(episode.drama!.title)》\(episode.title)"
-            poster.kf_setImageWithURL(NSURL(string: episode.posterUrl)!)
+            poster.kf.setImage(with: URL(string: episode.posterUrl)!)
             if episode.userFavorite != nil {
                 updateFavorite((episode.userFavorite?.type)!, rating: (episode.userFavorite?.rating)!)
             } else {
-                favoriteType.hidden = true
-                ratingBar.hidden = true
-                addFavAndReview.hidden = false
-                editFavAndReview.hidden = true
-                addFavorite.hidden = false
-                editFavorite.hidden = true
-                deleteFavorite.hidden = true
+                favoriteType.isHidden = true
+                ratingBar.isHidden = true
+                addFavAndReview.isHidden = false
+                editFavAndReview.isHidden = true
+                addFavorite.isHidden = false
+                editFavorite.isHidden = true
+                deleteFavorite.isHidden = true
             }
-            dramaTitle.setTitle(episode.drama?.title, forState: UIControlState.Normal)
+            dramaTitle.setTitle(episode.drama?.title, for: UIControlState())
             episodeTitle.text = episode.title
             alias.text = episode.alias
-            reviews.setTitle("评论 \(episode.reviews)", forState: UIControlState.Normal)
+            reviews.setTitle("评论 \(episode.reviews)", for: UIControlState())
             type.text = episode.drama?.typeString
             era.text = episode.drama?.eraString
             genre.text = episode.drama?.genre
@@ -99,116 +99,116 @@ class EpisodeViewController: UITableViewController {
             releaseDate.text = episode.releaseDate
             url.text = episode.url
             sc.text = "\(episode.sc)\n\(episode.introduction)"
-            addReview.enabled = true
+            addReview.isEnabled = true
             tableView.reloadData()
         }
     }
     
-    private func updateFavorite(type: Int, rating: Double) {
+    fileprivate func updateFavorite(_ type: Int, rating: Double) {
         if (episode?.userFavorite == nil) {
             episode?.userFavorite = Epfav(type: type, rating: rating)
         } else {
             episode?.userFavorite?.type = type
             episode?.userFavorite?.rating = rating
         }
-        addFavAndReview.hidden = true
-        editFavAndReview.hidden = false
-        addFavorite.hidden = true
-        editFavorite.hidden = false
-        deleteFavorite.hidden = false
+        addFavAndReview.isHidden = true
+        editFavAndReview.isHidden = false
+        addFavorite.isHidden = true
+        editFavorite.isHidden = false
+        deleteFavorite.isHidden = false
         favoriteType.text = episode?.userFavorite?.typeString
-        favoriteType.hidden = false
+        favoriteType.isHidden = false
         if episode?.userFavorite?.rating != 0 {
             ratingBar.rating = (episode?.userFavorite?.rating)!
-            ratingBar.hidden = false
+            ratingBar.isHidden = false
         } else {
-            ratingBar.hidden = true
+            ratingBar.isHidden = true
         }
     }
 
-    @IBAction func deleteFavorite(sender: UIButton) {
-        let alertController = UIAlertController(title: "删除收藏", message: "确定要删除吗？", preferredStyle: .Alert)
-        let okAction = UIAlertAction(title: "确定", style: .Default, handler: { _ in
-            Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+    @IBAction func deleteFavorite(_ sender: UIButton) {
+        let alertController = UIAlertController(title: "删除收藏", message: "确定要删除吗？", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "确定", style: .default, handler: { _ in
+            Alamofire.request(Router.getToken()).validate().responseJSON { response in
                 switch response.result {
-                case .Success:
+                case .success:
                     if let value = response.result.value {
                         let token = Token(json: JSON(value)).token
-                        Alamofire.request(Router.DestroyEpfav(token: token, episodeId: self.episodeId!)).validate().responseJSON { response in
+                        Alamofire.request(Router.destroyEpfav(token: token, episodeId: self.episodeId!)).validate().responseJSON { response in
                                 switch response.result {
-                                case .Success:
+                                case .success:
                                     self.episode?.userFavorite = nil
-                                    self.favoriteType.hidden = true
-                                    self.ratingBar.hidden = true
-                                    self.addFavAndReview.hidden = false
-                                    self.editFavAndReview.hidden = true
-                                    self.addFavorite.hidden = false
-                                    self.editFavorite.hidden = true
-                                    self.deleteFavorite.hidden = true
-                                case .Failure(let error):
+                                    self.favoriteType.isHidden = true
+                                    self.ratingBar.isHidden = true
+                                    self.addFavAndReview.isHidden = false
+                                    self.editFavAndReview.isHidden = true
+                                    self.addFavorite.isHidden = false
+                                    self.editFavorite.isHidden = true
+                                    self.deleteFavorite.isHidden = true
+                                case .failure(let error):
                                     print(error)
                                 }
                         }
                     }
-                case .Failure(let error):
+                case .failure(let error):
                     print(error)
                 }
             }
             })
         alertController.addAction(okAction)
-        let cancelAction = UIAlertAction(title: "取消", style: .Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
-        self.presentViewController(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 4
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    override func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 200
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowReviews" {
-            let episodeReviewsViewController = segue.destinationViewController as! EpisodeReviewsViewController
+            let episodeReviewsViewController = segue.destination as! EpisodeReviewsViewController
             episodeReviewsViewController.episodeId = episodeId
         } else if segue.identifier == "ShowDrama" {
-            let dramaViewController = segue.destinationViewController as! DramaViewController
+            let dramaViewController = segue.destination as! DramaViewController
             dramaViewController.dramaId = episode?.dramaId
         } else if segue.identifier == "Login" {
-            let loginViewController = segue.destinationViewController as! LoginViewController
+            let loginViewController = segue.destination as! LoginViewController
             loginViewController.unwindSegueIdentifier = "UnwindToEpisodeViewController"
         } else if segue.identifier == "CreateReview" {
-            let writeReviewViewController = segue.destinationViewController as! WriteReviewViewController
+            let writeReviewViewController = segue.destination as! WriteReviewViewController
             writeReviewViewController.unwindSegueIdentifier = "UnwindToEpisodeViewController"
             writeReviewViewController.dramaId = episode?.dramaId
             writeReviewViewController.episodeId = episodeId
         } else if segue.identifier == "CreateEpfav" {
-            let epfavViewController = segue.destinationViewController as! EpfavViewController
+            let epfavViewController = segue.destination as! EpfavViewController
             epfavViewController.epfav = Epfav(type: 1, rating: 0)
             epfavViewController.epfav?.episodeId = episodeId!
         } else if segue.identifier == "EditEpfav" {
-            let epfavViewController = segue.destinationViewController as! EpfavViewController
+            let epfavViewController = segue.destination as! EpfavViewController
             let epfav = episode!.userFavorite!
             epfavViewController.epfav = Epfav(type: epfav.type, rating: epfav.rating)
             epfavViewController.epfav?.episodeId = episodeId!
             epfavViewController.isUpdate = true
         } else if segue.identifier == "CreateEpfavReview" {
-            let epfavReviewViewController = segue.destinationViewController as! EpfavReviewViewController
+            let epfavReviewViewController = segue.destination as! EpfavReviewViewController
             epfavReviewViewController.epfav = Epfav(type: 1, rating: 0)
             epfavReviewViewController.epfav?.episodeId = episodeId!
             epfavReviewViewController.dramaId = episode?.dramaId
         } else if segue.identifier == "EditEpfavReview" {
-            let epfavReviewViewController = segue.destinationViewController as! EpfavReviewViewController
+            let epfavReviewViewController = segue.destination as! EpfavReviewViewController
             let epfav = episode!.userFavorite!
             epfavReviewViewController.epfav = Epfav(type: epfav.type, rating: epfav.rating)
             epfavReviewViewController.epfav?.episodeId = episodeId!
@@ -217,15 +217,15 @@ class EpisodeViewController: UITableViewController {
         }
     }
     
-    @IBAction func unwindToEpisodeViewController(sender: UIStoryboardSegue) {
-        if (sender.sourceViewController as? LoginViewController) != nil {
+    @IBAction func unwindToEpisodeViewController(_ sender: UIStoryboardSegue) {
+        if (sender.source as? LoginViewController) != nil {
             testLogin()
-        } else if (sender.sourceViewController as? WriteReviewViewController) != nil {
+        } else if (sender.source as? WriteReviewViewController) != nil {
             episode?.reviews += 1
-            reviews.setTitle("评论 \(episode!.reviews)", forState: UIControlState.Normal)
-        } else if let sourceViewController = sender.sourceViewController as? EpfavViewController, epfav = sourceViewController.epfav {
+            reviews.setTitle("评论 \(episode!.reviews)", for: UIControlState())
+        } else if let sourceViewController = sender.source as? EpfavViewController, let epfav = sourceViewController.epfav {
             updateFavorite(epfav.type, rating: epfav.rating)
-        } else if let sourceViewController = sender.sourceViewController as? EpfavReviewViewController, epfav = sourceViewController.epfav {
+        } else if let sourceViewController = sender.source as? EpfavReviewViewController, let epfav = sourceViewController.epfav {
             updateFavorite(epfav.type, rating: epfav.rating)
         }
     }

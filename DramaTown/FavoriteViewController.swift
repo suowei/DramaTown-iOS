@@ -22,7 +22,7 @@ class FavoriteViewController: UIViewController, TagListViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tags.layer.borderColor = UIColor.lightGrayColor().CGColor
+        tags.layer.borderColor = UIColor.lightGray.cgColor
         tags.layer.borderWidth = 1
         tags.layer.cornerRadius = 6
         commonTags.delegate = self
@@ -38,71 +38,71 @@ class FavoriteViewController: UIViewController, TagListViewDelegate {
                 type.selectedSegmentIndex = favorite.type
                 typeChanged(type)
                 rating.rating = favorite.rating
-                tags.setStringItems(favorite.tags.componentsSeparatedByString(","))
+                tags.setStringItems(items: favorite.tags.components(separatedBy: ","))
             }
         }
     }
     
-    @IBAction func save(sender: UIButton) {
+    @IBAction func save(_ sender: UIButton) {
         favorite!.type = type.selectedSegmentIndex
         favorite!.rating = rating.rating
-        favorite!.tags = tags.stringItems().joinWithSeparator(",")
+        favorite!.tags = tags.stringItems().joined(separator: ",")
         infoLabel.text = "处理中……"
-        infoLabel.hidden = false
-        Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+        infoLabel.isHidden = false
+        Alamofire.request(Router.getToken()).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let token = Token(json: JSON(value)).token
                     if self.isUpdate {
-                        Alamofire.request(Router.UpdateFavorite(token: token, id: self.favorite!.id, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags)).validate().responseJSON { response in
+                        Alamofire.request(Router.updateFavorite(token: token, id: self.favorite!.id, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags)).validate().responseJSON { response in
                                 switch response.result {
-                                case .Success:
-                                    self.performSegueWithIdentifier("UnwindToDramaViewController", sender: nil)
-                                case .Failure(let error):
+                                case .success:
+                                    self.performSegue(withIdentifier: "UnwindToDramaViewController", sender: nil)
+                                case .failure(let error):
                                     self.infoLabel.text = "保存失败"
                                     print(error)
                                 }
                         }
                     } else {
-                        Alamofire.request(Router.CreateFavorite(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags)).validate().responseJSON { response in
+                        Alamofire.request(Router.createFavorite(token: token, dramaId: self.favorite!.dramaId, type: self.favorite!.type, rating: self.favorite!.rating, tags: self.favorite!.tags)).validate().responseJSON { response in
                                 switch response.result {
-                                case .Success:
-                                    self.performSegueWithIdentifier("UnwindToDramaViewController", sender: nil)
-                                case .Failure(let error):
+                                case .success:
+                                    self.performSegue(withIdentifier: "UnwindToDramaViewController", sender: nil)
+                                case .failure(let error):
                                     self.infoLabel.text = "保存失败"
                                     print(error)
                                 }
                         }
                     }
                 }
-            case .Failure(let error):
+            case .failure(let error):
                 self.infoLabel.text = "保存失败"
                 print(error)
             }
         }
     }
     
-    @IBAction func typeChanged(sender: UISegmentedControl) {
+    @IBAction func typeChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            rating.hidden = true
-            clearButton.hidden = true
+            rating.isHidden = true
+            clearButton.isHidden = true
         } else {
-            rating.hidden = false
-            clearButton.hidden = false
+            rating.isHidden = false
+            clearButton.isHidden = false
         }
     }
     
-    @IBAction func clearRating(sender: UIButton) {
+    @IBAction func clearRating(_ sender: UIButton) {
         rating.rating = 0
     }
     
-    func tagPressed(title: String, tagView: TagView, sender: TagListView) {
-        tags.addStringItem(title)
+    func tagPressed(_ title: String, tagView: TagView, sender: TagListView) {
+        _ = tags.addStringItem(text: title)
     }
     
-    @IBAction func cancel(sender: UIButton) {
-        dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func cancel(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
     }
 
 }

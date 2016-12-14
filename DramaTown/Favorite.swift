@@ -59,17 +59,17 @@ class Favorite {
     var drama: Drama? = nil
     
     init(json: JSON) {
-        if json["id"] != nil {
+        if json["id"] != JSON.null {
             id = Int(json["id"].stringValue)!
         }
-        if json["drama_id"] != nil {
+        if json["drama_id"] != JSON.null {
             dramaId = Int(json["drama_id"].stringValue)!
         }
         type = Int(json["type"].stringValue)!
         rating = Double(json["rating"].stringValue)!
         tags = json["tags"].stringValue
         updatedAt = json["updated_at"].stringValue
-        if json["drama"] != nil {
+        if json["drama"] != JSON.null {
             drama = Drama(json: json["drama"])
         }
     }

@@ -14,50 +14,50 @@ class LoginViewController: UIViewController {
         super.viewDidLoad()
     }
     
-    @IBAction func loginButtonClicked(sender: UIButton) {
+    @IBAction func loginButtonClicked(_ sender: UIButton) {
         login()
     }
     
-    @IBAction func cancel(sender: UIBarButtonItem) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        _ = navigationController?.popViewController(animated: true)
     }
     
     func login() {
-        loginButton.enabled = false
-        Alamofire.request(Router.GetToken()).validate().responseJSON { response in
+        loginButton.isEnabled = false
+        Alamofire.request(Router.getToken()).validate().responseJSON { response in
             switch response.result {
-            case .Success:
+            case .success:
                 if let value = response.result.value {
                     let token = Token(json: JSON(value)).token
                     let email = self.email.text!
                     let password = self.password.text!
-                    Alamofire.request(Router.Login(token: token, email: email, password: password, remember: "on")).validate(statusCode: 200...400).responseJSON { response in
+                    Alamofire.request(Router.login(token: token, email: email, password: password, remember: "on")).validate(statusCode: 200...400).responseJSON { response in
                         switch response.result {
-                        case .Success:
+                        case .success:
                             if let value = response.result.value {
                                 let user = User(json: JSON(value))
-                                NSUserDefaults.standardUserDefaults().setInteger(user.id, forKey: "UserId")
-                                self.performSegueWithIdentifier(self.unwindSegueIdentifier, sender: nil)
+                                UserDefaults.standard.set(user.id, forKey: "UserId")
+                                self.performSegue(withIdentifier: self.unwindSegueIdentifier, sender: nil)
                             }
-                        case .Failure(let error):
+                        case .failure(let error):
                             self.fail()
                             print(error)
                         }
                     }
                 }
-            case .Failure(let error):
-                self.loginButton.enabled = true
+            case .failure(let error):
+                self.loginButton.isEnabled = true
                 print(error)
             }
         }
     }
     
     func fail() {
-        self.loginButton.enabled = true
-        let alertController = UIAlertController(title: "登录失败", message: "请检查输入", preferredStyle: .Alert)
-        let okAction = UIAlertAction(title: "确定", style: .Default, handler: nil)
+        self.loginButton.isEnabled = true
+        let alertController = UIAlertController(title: "登录失败", message: "请检查输入", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "确定", style: .default, handler: nil)
         alertController.addAction(okAction)
-        self.presentViewController(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
 
 }

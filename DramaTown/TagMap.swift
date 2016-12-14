@@ -9,12 +9,12 @@ class TagMap {
     var tag: Tag? = nil
     
     init(json: JSON) {
-        if json["drama_id"] != nil {
+        if json["drama_id"] != JSON.null {
             dramaId = Int(json["drama_id"].stringValue)!
         }
         tagId = Int(json["tag_id"].stringValue)!
         count = Int(json["count"].stringValue)!
-        if json["tag"] != nil {
+        if json["tag"] != JSON.null {
             tag = Tag(json: json["tag"])
         }
     }
